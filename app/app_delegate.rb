@@ -16,6 +16,11 @@ class AppDelegate
     true
   end
 
+  def directorDidReshapeProjection(director)
+    scene = GameScene.new
+    director.run_with_scene(scene) if direction.running_scene.nil?
+  end
+
   def applicationWillResignActive(app)
     @director.pause if @navigation_controller.visibleViewController == @director
   end
