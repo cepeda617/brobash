@@ -3,7 +3,7 @@ class AppDelegate
   def application(application, didFinishLaunchingWithOptions:launchOptions)
 
     @director = Joybox::Configuration.setup do
-      director display_stats: true
+      director display_stats: true, enable_retina_display: false
       debug repl:true # interactive console support for joybox (turn off for deployment!)
     end
 
@@ -13,12 +13,13 @@ class AppDelegate
     @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
     @window.setRootViewController(@navigation_controller)
     @window.makeKeyAndVisible
-    true
-  end
 
-  def directorDidReshapeProjection(director)
-    scene = GameScene.new
-    director.run_with_scene(scene) if direction.running_scene.nil?
+    # Hide status bar
+    UIApplication.sharedApplication.setStatusBarHidden true, animated:false
+
+    @director << GameScene.new
+
+    true
   end
 
   def applicationWillResignActive(app)
