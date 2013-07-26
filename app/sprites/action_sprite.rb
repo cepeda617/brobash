@@ -6,10 +6,10 @@ class ActionSprite < Joybox::Core::Sprite
     attacking: 3
   }
 
-  attr_accessor :center, :damage, :power, :walk_speed, :jump_force, :velocity, :state
+  attr_accessor :center, :damage, :power, :walk_speed, :jump_force, :velocity, :state,
+  :idle_animation, :walk_animation, :attack_animation
 
   def initialize( options = {}, &block )
-    puts '>>> on enter ActionSprite: %s' % options
     @center = [16, 16]
     @damage = 0
     @power = 20
@@ -39,7 +39,7 @@ class ActionSprite < Joybox::Core::Sprite
   def idle
     unless idle?
       # puts 'Character idle'
-      # stop and run_action idle_animation
+      stop and run_action idle_animation
       @state = action_states[:idle]
     end
   end
@@ -71,20 +71,11 @@ class ActionSprite < Joybox::Core::Sprite
   def land
   end
 
-  def animate_action( name, options = {} )
-    delay = 1.0 / (options[:speed] || 12)
-    repeat = options[:repeat] || true
-
-    action_frames = SpriteFrameCache.frames.where prefix: name, suffix: '.png', from: 0
-    animation = Animation.new frames: action_frames, delay: delay
-    repeat ? Repeat.forever(action: animation.action) : Animate.with(action: animation.action)
-  end
-
   private
 
   def walk_with_direction( direction )
     if idle?
-      # stop and run_action walk_animation
+      stop and run_action walk_animation
       @state = action_states[:walking]
     end
 
