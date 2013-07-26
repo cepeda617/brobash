@@ -12,8 +12,8 @@ class GameLayer < Joybox::Core::Layer
     init_dpad
 
     schedule_update do |dt|
-      control_player(@player)
-      @player.update(dt)
+      control_player(@player.sprite)
+      @player.sprite.update(dt)
     end
   end
 
@@ -29,10 +29,9 @@ class GameLayer < Joybox::Core::Layer
   end
 
   def init_player
-    @player = CharacterSprite.new name: 'pete', frame_name: 'pete-character-idle0.png', position: center
-    # @player = CharacterSprite.with_name name: 'pete', frame_name: 'pete-character-idle0.png', position: center
-    @player.idle
-    self << @player
+    @player = Character.new 'pete', position: center
+    @player.sprite.idle
+    self << @player.sprite
   end
 
 end
