@@ -1,27 +1,35 @@
 class Character
 
-  attr_reader :name
-  attr_accessor :sprite
+  include Actions
+
+  STATS = {
+    pete: { power: 20, speed: 150, vertical: 300 }
+  }
+
+  attr_reader :name, :idle_animation, :walk_animation
+  attr_accessor :sprite, :velocity, :state, :damage
 
   def initialize( name, options = {} )
     @name = name
-    @sprite = ActionSprite.new frame_name: '%s-character-idle0.png' % name
+    @sprite = PhysicsSprite.new body: options[:body], frame_name: '%s-character-idle0.png' % name
     @sprite.position = options[:position] if options.key? :position
 
-    @sprite.idle_animation = animate_action '%s-character-idle' % name
-    @sprite.walk_animation = animate_action '%s-character-walk' % name
-    @sprite.attack_animation = animate_action '%s-character-attack' % name, repeat: false, speed: 18
+    @velocity = CGPointZero
+    @damage = 0
+
+    @idle_animation = animate_action '%s-character-idle' % name
+    @walk_animation = animate_action '%s-character-walk' % name
   end
 
-  private
+  def stats
+    STATS[name.to_sym]
+  end
 
-  def animate_action( name, options = {} )
-    delay = 1.0 / (options[:speed] || 12)
-    repeat = options[:repeat] || true
-
-    action_frames = SpriteFrameCache.frames.where prefix: name, suffix: '.png', from: 0
-    animation = Animation.new frames: action_frames, delay: delay
-    repeat ? Repeat.forever(action: animation.action) : Animate.with(action: animation.action)
+  # Defines accessor for each stat
+  %w( power speed vertical ).each do |stat|
+    define_method stat do
+      stats[stat.to_sym]
+    end
   end
 
 end

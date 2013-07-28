@@ -3,17 +3,19 @@ class GameLayer < Joybox::Core::Layer
   include GameHelper
   include GameController
 
-  attr_accessor :player
+  attr_accessor :player, :world
 
   def on_enter
     setup_sprite_batches
-
+    init_world
     init_player
     init_dpad
 
     schedule_update do |dt|
-      control_player(@player.sprite)
-      @player.sprite.update(dt)
+      control_player(@player)
+      @player.update(dt)
+
+      @world.step delta: dt
     end
   end
 
@@ -28,9 +30,21 @@ class GameLayer < Joybox::Core::Layer
     self << sprite_batch
   end
 
+  def init_world
+    @world = World.new gravity: [0, -10]
+
+    ground = world.new_body position: [0, 0] do
+      polygon_fixture box: [Screen.width, 20]
+    end
+  end
+
   def init_player
-    @player = Character.new 'pete', position: center
-    @player.sprite.idle
+    body = world.new_body position: [0, 0], type: KDynamicBodyType do
+      polygon_fixture box: [32, 32]
+    end
+
+    @player = Character.new 'pete', position: center, body: body
+    @player.idle
     self << @player.sprite
   end
 
