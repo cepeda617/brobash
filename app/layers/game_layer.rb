@@ -4,6 +4,7 @@ class GameLayer < Joybox::Core::Layer
   include GameController
 
   attr_accessor :player, :world
+  attr_reader :ground
 
   def on_enter
     setup_sprite_batches
@@ -12,8 +13,7 @@ class GameLayer < Joybox::Core::Layer
     init_dpad
 
     schedule_update do |dt|
-      control_player(@player)
-      @player.update(dt)
+      control_player
 
       @world.step delta: dt
     end
@@ -31,21 +31,31 @@ class GameLayer < Joybox::Core::Layer
   end
 
   def init_world
-    @world = World.new gravity: [0, -10]
+    @world = World.new gravity: [0, -20]
 
-    ground = world.new_body position: [0, 0] do
-      polygon_fixture box: [Screen.width, 20]
+    @ground = world.new_body position: [0, 0] do
+      polygon_fixture box: [Screen.width, 60], friction: 1.0
     end
   end
 
   def init_player
-    body = world.new_body position: [0, 0], type: KDynamicBodyType do
-      polygon_fixture box: [32, 32]
+    body_options = {
+      fixed_rotation: true,
+      position: [0, 0],
+      type: KDynamicBodyType
+    }
+
+    body = world.new_body body_options do
+      polygon_fixture box: [32, 32], friction: 0.5, density: 1.0
     end
 
     @player = Character.new 'pete', position: center, body: body
     @player.idle
     self << @player.sprite
+
+    world.when_collide ground do |colliding_body, is_touching|
+      @player.on_ground = true if colliding_body == body
+    end
   end
 
 end

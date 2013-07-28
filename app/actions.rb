@@ -16,10 +16,6 @@ module Actions
     end
   end
 
-  def update( dt )
-    sprite.position = jbpAdd(sprite.position, jbpMult(self.velocity, dt)) if walking?
-  end
-
   def idle
     unless idle?
       sprite.stop_all_actions and sprite.run_action idle_animation
@@ -42,9 +38,21 @@ module Actions
     end
 
     if walking?
-      self.velocity = jbp(direction * self.speed, self.velocity.y)
-      sprite.flip x: (self.velocity.x >= 0) ? false : true
+      # self.velocity = jbp(direction * self.speed, self.velocity.y)
+      sprite.body.apply_force force: [direction * self.speed, 0]
+      sprite.flip x: (direction >= 0) ? false : true
     end
+  end
+
+  def jump
+    if on_ground? and (idle? or walking?)
+      sprite.body.apply_force force: [0, self.vertical]
+      self.on_ground = false
+    end
+  end
+
+  def on_ground?
+    self.on_ground
   end
 
   def animate_action( name, options = {} )

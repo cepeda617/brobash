@@ -3,11 +3,11 @@ class Character
   include Actions
 
   STATS = {
-    pete: { power: 20, speed: 150, vertical: 300 }
+    pete: { power: 20, speed: 50, vertical: 1000 }
   }
 
   attr_reader :name, :idle_animation, :walk_animation
-  attr_accessor :sprite, :velocity, :state, :damage
+  attr_accessor :sprite, :velocity, :state, :damage, :on_ground
 
   def initialize( name, options = {} )
     @name = name
@@ -16,6 +16,7 @@ class Character
 
     @velocity = CGPointZero
     @damage = 0
+    @on_ground = false
 
     @idle_animation = animate_action '%s-character-idle' % name
     @walk_animation = animate_action '%s-character-walk' % name
