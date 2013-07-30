@@ -1,13 +1,13 @@
 module GameController
 
   def init_dpad
-    buttons = [left_button, right_button]
-    dpad = Menu.new items: buttons, position: [60,30]
+    @directional_buttons = [left_button, right_button]
+    dpad = Menu.new items: @directional_buttons, position: [60,30]
     dpad.align_items_horizontally
     self << dpad
 
-    buttons = [jump_button, attack_button]
-    dpad = Menu.new items: buttons, position: [Screen.width - 60, 30]
+    @action_buttons = [jump_button, attack_button]
+    dpad = Menu.new items: @action_buttons, position: [Screen.width - 60, 30]
     dpad.align_items_horizontally
     self << dpad
   end
@@ -17,13 +17,17 @@ module GameController
       self.player.walk_left
     elsif right_button.held?
       self.player.walk_right
-    else
-      self.player.idle
     end
 
     if jump_button.held?
       self.player.jump
     end
+
+    self.player.idle unless input?
+  end
+
+  def input?
+    (@directional_buttons + @action_buttons).any?(&:held?)
   end
 
   def left_button
