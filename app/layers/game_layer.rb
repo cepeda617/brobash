@@ -13,9 +13,8 @@ class GameLayer < Joybox::Core::Layer
     init_dpad
 
     schedule_update do |dt|
-      control_player
-
       @world.step delta: dt
+      move_player
     end
   end
 
@@ -45,16 +44,16 @@ class GameLayer < Joybox::Core::Layer
       type: KDynamicBodyType
     }
 
-    body = world.new_body body_options do
+    player_body = world.new_body body_options do
       polygon_fixture box: [32, 32], friction: 0.5, density: 1.0
     end
 
-    @player = Character.new 'pete', position: center, body: body
+    @player = Character.new 'pete', position: center, body: player_body
     @player.idle
     self << @player.sprite
 
     world.when_collide ground do |colliding_body, is_touching|
-      @player.on_ground = true if colliding_body == body
+      @player.land if colliding_body == player_body
     end
   end
 

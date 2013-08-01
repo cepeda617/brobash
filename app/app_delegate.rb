@@ -17,6 +17,8 @@ class AppDelegate
     # Hide status bar
     UIApplication.sharedApplication.setStatusBarHidden true, animated:false
 
+    @director.view.setMultipleTouchEnabled(true)
+
     @director << GameScene.new
 
     true

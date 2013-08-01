@@ -2,7 +2,8 @@ module Actions
 
   STATES = {
     idle: 1,
-    walking: 2
+    walking: 2,
+    jumping: 3
   }
 
   def states
@@ -23,21 +24,21 @@ module Actions
     end
   end
 
-  def walk_left
-    walk_with_direction -1
+  def move_left
+    move_with_direction -1
   end
 
-  def walk_right
-    walk_with_direction 1
+  def move_right
+    move_with_direction 1
   end
 
-  def walk_with_direction( direction )
+  def move_with_direction( direction )
     if idle?
       sprite.stop_all_actions and sprite.run_action walk_animation
       self.state = states[:walking]
     end
 
-    if walking?
+    if moving?
       # self.velocity = jbp(direction * self.speed, self.velocity.y)
       sprite.body.apply_force force: [direction * self.speed, 0]
       sprite.flip x: (direction >= 0) ? false : true
@@ -45,13 +46,23 @@ module Actions
   end
 
   def jump
-    if on_ground? and (idle? or walking?)
+    if grounded?
       sprite.body.apply_force force: [0, self.vertical]
+      self.state = states[:jumping]
       self.on_ground = false
     end
   end
 
-  def on_ground?
+  def land
+    self.on_ground = true
+    idle
+  end
+
+  def moving?
+    walking? || jumping?
+  end
+
+  def grounded?
     self.on_ground
   end
 
