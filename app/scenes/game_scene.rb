@@ -1,13 +1,17 @@
 class GameScene < Joybox::Core::Scene
 
-  attr_accessor :game, :hud, :game_pad
+  attr_accessor :game, :hud, :controller
 
   def on_enter
     @game = GameLayer.new
     @hud = HudLayer.new
+    @controller = GameController.new
 
-    self << @game
-    self << @hud
+    self << game
+    self << hud
+    self << controller
+
+    game.controller = controller
   end
 
   def on_exit

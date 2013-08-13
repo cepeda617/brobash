@@ -1,4 +1,4 @@
-module GameController
+class GameController < Joybox::Core::Layer
 
   # def init_dpad
   #   @input = false
@@ -73,7 +73,7 @@ module GameController
   #   self.player.jump if holding_jump?
   # end
 
-  def init_dpad
+  def on_enter
     @directional_buttons = [left_button, right_button]
     dpad = Menu.new items: @directional_buttons, position: [60,30]
     dpad.align_items_horizontally
@@ -85,20 +85,6 @@ module GameController
     self << dpad
 
     all_buttons.each { |button| button.opacity = 64 }
-  end
-
-  def move_player
-    if left_button.held?
-      self.player.move_left
-    elsif right_button.held?
-      self.player.move_right
-    end
-
-    if jump_button.held?
-      self.player.jump
-    end
-
-    self.player.idle unless input?
   end
 
   def all_buttons
@@ -123,7 +109,6 @@ module GameController
 
   def jump_button
     @jump_button ||= MenuImageHoldable.new image_file_name:'dpad-jump.png' do |menu_item|
-      self.player.jump
     end
   end
 
