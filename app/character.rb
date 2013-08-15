@@ -1,7 +1,6 @@
 class Character
 
   include Actions
-  include Helper
 
   STATS = {
     pete: { power: 16, speed: 64, vertical: 640 }

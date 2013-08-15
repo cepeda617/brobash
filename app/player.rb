@@ -1,39 +1,77 @@
 class Player
 
+  STATES = %w( idle walking jumping falling ).map(&:to_sym)
+
   attr_reader :options
-  attr_accessor :character
+  attr_accessor :state, :on_ground, :velocity, :desired_position
 
   def initialize( options = {} )
     @options = options
-    @world = options[:world].world
-    @ground = options[:world].ground
-    # character.idle
-  end
-
-  def character
-    @character ||= Character.new options[:character], position: options[:position], world: @world
+    @name = options[:name]
+    @state = nil
+    @on_ground = false
+    
+    zero_out
   end
 
   def sprite
-    character.sprite
+    @sprite ||= Sprite.new frame_name: '%s-character-idle0.png' % @name, position: options[:position]
+  end
+
+  def position
+    @sprite.position
+  end
+
+  def position=( position )
+    @sprite.position = position
   end
 
   def update( dt )
-    character.update(dt)
+    GameWorld.apply_gravity(self, dt)
   end
 
-  def input( controller )
-    if controller.left_button.held?
-      character.move_left
-    elsif controller.right_button.held?
-      character.move_right
+  def zero_out
+    @velocity = [0, 0]
+  end
+
+  # Actions
+  def idle
+    unless idle?
+      sprite.stop_all_actions and animate_idle
+      state = :idle
+      on_ground = true
+    end
+  end
+
+  def walk_with_direction( direction )
+    if idle?
+      sprite.stop_all_actions and animate_walk
+      state = :walking
     end
 
-    if controller.jump_button.held?
-      character.jump
+    if walking?
     end
+  end
 
-    (character.grounded? ? character.idle : character.fall) unless controller.input?
+  def fall
+    unless falling?
+      state = :falling
+    end
+  end
+
+  def land
+    @on_ground = true
+    idle
+  end
+
+  def grounded?
+    @on_ground
+  end
+
+  STATES.each do |state_name|
+    define_method "#{ state_name }?" do
+      self.state == state_name
+    end
   end
 
 end

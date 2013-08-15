@@ -1,23 +1,26 @@
 class GameWorld
 
-  attr_accessor :world
+  @gravity = [0, -450]
 
-  def initialize
-    @world = World.new gravity: [0, -20]
-  end
+  class << self
 
-  def physics
-    @world
-  end
+    attr_accessor :gravity
 
-  def ground
-    @ground ||= world.new_body position: [0, 0] do
-      polygon_fixture box: [Screen.width, 60], friction: 1.0
+    def apply_gravity( object, dt )
+      velocity = velocity_step(object.velocity, dt)
+      object.desired_position = [object.position[0] + velocity[0], object.position[1] + velocity[1]].to_point
     end
-  end
 
-  def update(dt)
-    world.step delta: dt
+    def velocity_step( velocity, dt )
+      gravity = gravity_step(dt)
+      velocity = [velocity[0] + gravity[0], velocity[1] + gravity[1]]
+      [velocity[0] * dt, velocity[1] * dt]
+    end
+
+    def gravity_step( dt )
+       [gravity[0] * dt, gravity[1] * dt]
+     end
+
   end
 
 end

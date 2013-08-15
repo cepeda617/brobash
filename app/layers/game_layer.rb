@@ -1,23 +1,23 @@
 class GameLayer < Joybox::Core::Layer
 
-  include Helper
-
-  attr_accessor :player, :world, :controller
+  attr_accessor :player, :controller
 
   def on_enter
     setup_sprite_batches
 
-    @world = GameWorld.new
+    background = LayerColor.new color: "92d6dd".to_color
+    self << background
+    level = MapLayer.new
+    self << level
     
-    @player = Player.new character: 'pete', position: center, world: world
+    @player = Player.new character: 'pete', position: [Screen.width * 0.5, Screen.width * 0.9]
     self << @player.sprite
 
-    setup_player_collisions
-
     schedule_update do |dt|
-      world.update(dt)
       player.update(dt)
-      player.input(controller)
+      send_controller_input_to_player
+      # level.tiles_surrounding(player.sprite, level.ground)
+      level.collide_with(player)
     end
   end
 
@@ -32,10 +32,22 @@ class GameLayer < Joybox::Core::Layer
     self << sprite_batch
   end
 
-  def setup_player_collisions
-    @world.physics.when_collide @player.sprite do |colliding_body, is_touching|
-      player.character.land if colliding_body == @world.ground
+  def send_controller_input_to_player
+    if controller.left_button.held?
+      player.move_left
+    elsif controller.right_button.held?
+      player.move_right
     end
+
+    if controller.jump_button.held?
+      player.jump
+    end
+
+    (player.grounded? ? player.idle : player.fall) unless controller.input?
+  end
+
+  def center
+    [Screen.width, Screen.height].to_point.half
   end
 
 end
