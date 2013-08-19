@@ -3,11 +3,11 @@ class Player
   STATES = %w( idle walking jumping falling ).map(&:to_sym)
 
   attr_reader :options
-  attr_accessor :state, :on_ground, :velocity, :desired_position
+  attr_accessor :state, :on_ground, :velocity, :desired_position, :character
 
   def initialize( options = {} )
     @options = options
-    @name = options[:name]
+    @character = options[:character]
     @state = nil
     @on_ground = false
     
@@ -15,7 +15,7 @@ class Player
   end
 
   def sprite
-    @sprite ||= Sprite.new frame_name: '%s-character-idle0.png' % @name, position: options[:position]
+    @sprite ||= Sprite.new frame_name: "#{ character }-character-idle0.png", position: options[:position]
   end
 
   def position
@@ -37,7 +37,7 @@ class Player
   # Actions
   def idle
     unless idle?
-      sprite.stop_all_actions and animate_idle
+      sprite.stop_all_actions# and animate_idle
       state = :idle
       on_ground = true
     end
@@ -45,7 +45,7 @@ class Player
 
   def walk_with_direction( direction )
     if idle?
-      sprite.stop_all_actions and animate_walk
+      sprite.stop_all_actions# and animate_walk
       state = :walking
     end
 

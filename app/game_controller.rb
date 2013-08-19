@@ -1,78 +1,5 @@
 class GameController < Joybox::Core::Layer
 
-  # def init_dpad
-  #   @input = false
-  #   @direction = 0
-
-  #   on_touches_began do |touches, event|
-  #     update_inputs_from_touches(touches)
-  #   end
-
-  #   on_touches_moved do |touches, event|
-  #     update_inputs_from_touches(touches)
-  #   end
-
-  #   on_touches_ended do |touches, event|
-  #     no_input
-  #   end
-
-  #   # on_touches_cancelled do |touches, event|
-  #   # end
-  # end
-
-  # def update_inputs_from_touches( touches )
-  #   for touch in touches do
-  #     @holding_left = left?(touch)
-  #     @holding_right = right?(touch)
-  #     @holding_jump = jump?(touch)
-  #   end
-
-  #   @input = touches.nil? ? false : true
-  # end
-
-  # def no_input
-  #   self.player.idle if self.player.moving?
-  #   @direction = 0
-  #   @input = false
-  #   @holding_left = false
-  #   @holding_right = false
-  #   @holding_jump = false
-  # end
-
-  # def left?( touch )
-  #   touch.location.x.between? 0, 80
-  # end
-
-  # def right?( touch )
-  #   touch.location.x.between? 81, 160
-  # end
-
-  # def jump?( touch )
-  #   touch.location.x.between? Screen.width - 160, Screen.width
-  # end
-
-  # def input?
-  #   @input
-  # end
-
-  # def holding_left?
-  #   @holding_left
-  # end
-
-  # def holding_right?
-  #   @holding_right
-  # end
-
-  # def holding_jump?
-  #   @holding_jump
-  # end
-
-  # def move_player
-  #   self.player.move_left if holding_left?
-  #   self.player.move_right if holding_right?
-  #   self.player.jump if holding_jump?
-  # end
-
   def on_enter
     @directional_buttons = [left_button, right_button]
     dpad = Menu.new items: @directional_buttons, position: [60,30]
@@ -115,6 +42,20 @@ class GameController < Joybox::Core::Layer
   def attack_button
     @attack_button ||= MenuImageHoldable.new image_file_name:'dpad-attack.png' do |menu_item|
     end
+  end
+
+  def control( player )
+    if left_button.held?
+      player.move_left
+    elsif right_button.held?
+      player.move_right
+    end
+
+    if jump_button.held?
+      player.jump
+    end
+
+    (player.grounded? ? player.idle : player.fall) unless input?
   end
 
 end

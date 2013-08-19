@@ -7,16 +7,16 @@ class GameLayer < Joybox::Core::Layer
 
     background = LayerColor.new color: "92d6dd".to_color
     self << background
+
     level = MapLayer.new
     self << level
     
-    @player = Player.new character: 'pete', position: [Screen.width * 0.5, Screen.width * 0.9]
-    self << @player.sprite
+    @player = Player.new character: 'pete', position: [Screen.width * 0.5, Screen.height * 0.8]
+    level << @player.sprite
 
     schedule_update do |dt|
       player.update(dt)
-      send_controller_input_to_player
-      # level.tiles_surrounding(player.sprite, level.ground)
+      controller.control(player)
       level.collide_with(player)
     end
   end
@@ -30,20 +30,6 @@ class GameLayer < Joybox::Core::Layer
     sprite_batch = SpriteBatch.new file_name: 'sprites/characters.pvr.ccz'
     sprite_batch.texture.setAliasTexParameters
     self << sprite_batch
-  end
-
-  def send_controller_input_to_player
-    if controller.left_button.held?
-      player.move_left
-    elsif controller.right_button.held?
-      player.move_right
-    end
-
-    if controller.jump_button.held?
-      player.jump
-    end
-
-    (player.grounded? ? player.idle : player.fall) unless controller.input?
   end
 
   def center

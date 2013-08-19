@@ -9,19 +9,19 @@ class MapLayer < Joybox::Core::Layer
     self << @map
 
     @ground = @map.tile_layers[:ground]
-
     # center_at [Screen.width/2, Screen.height/2].to_point
   end
 
   def tiles_surrounding( sprite, layer )
-    position = @map.coordinate_for_point(sprite.position)
+    position = layer.coordinate_for_point(sprite.position)
     # puts ">>> tiles surrounding: #{ [position.x, position.y] }, layer: #{ layer.name }"
 
     tiles = (0..8).to_a.map do |i|
       columns = i % 3
       rows = (i / 3).to_i
 
-      tile_position = [position[0] + (columns - 1), position[1] + (rows - 1)]
+      tile_coordinate = [position.x + (columns - 1), position.y + (rows - 1)]
+      tile_position = layer.point_for_coordinate(tile_coordinate)
       tile = layer.sprite_at tile_position
       tile_rect = coordinate_to_rect(tile_position)
 
@@ -35,12 +35,10 @@ class MapLayer < Joybox::Core::Layer
 
     tiles.delete_at(4)
     tiles = tiles.move(2, 6).swap(4, 6).swap(0, 4)
-    # puts tiles
-    # tiles
+    tiles
   end
 
   def coordinate_to_rect( coordinate )
-    coordinate = coordinate.to_point
     origin = [coordinate.x * @map.tile_size.width, @map.size.height - ((coordinate.y + 1) * @map.tile_size.height)].to_point
     [origin.x, origin.y, @map.tile_size.width, @map.tile_size.height].to_rect
   end
