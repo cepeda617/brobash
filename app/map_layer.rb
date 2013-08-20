@@ -33,9 +33,8 @@ class MapLayer < Joybox::Core::Layer
       }
     end
 
-    tiles.delete_at(4)
-    tiles = tiles.move(2, 6).swap(4, 6).swap(0, 4)
-    tiles
+    # Reorder by collision priority
+    %w( 7 1 3 5 0 2 6 8 ).map { |index| tiles[index.to_i] }
   end
 
   def coordinate_to_rect( coordinate )
@@ -51,7 +50,7 @@ class MapLayer < Joybox::Core::Layer
     tiles_surrounding(sprite, @ground).each_with_index do |data, index|
       if tile = data[:tile] and CGRectIntersectsRect(sprite.bounding_box, tile.boundingBox)
         intersection = CGRectIntersection(sprite.bounding_box, tile.boundingBox)
-
+puts ">>> sprite colliding at #{ index }"
         object.desired_position = case index
         when 0 then object.zero_out and object.land and [desired[0], desired[1] + intersection.size.height]
         when 1 then object.zero_out and [desired[0], desired[1] - intersection.size.height]
