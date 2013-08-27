@@ -10,7 +10,7 @@ class GameLayer < Joybox::Core::Layer
 
     level = MapLayer.new
     self << level
-    
+
     @player = Player.new character: 'pete', position: [Screen.width * 0.5, Screen.height * 0.8]
     level << @player.sprite
 

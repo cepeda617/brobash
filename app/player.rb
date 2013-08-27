@@ -8,10 +8,11 @@ class Player
   def initialize( options = {} )
     @options = options
     @character = options[:character]
+
     @state = nil
     @on_ground = false
-    
-    zero_out
+    @velocity = CGPointZero
+    @desired_position = nil
   end
 
   def sprite
@@ -27,16 +28,17 @@ class Player
   end
 
   def update( dt )
-    GameWorld.apply_gravity(self, dt)
-  end
-
-  def zero_out
-    @velocity = [0, 0]
+    gravity = GameWorld.gravity
+    gravity_step = jbpMult(gravity, dt)
+    self.velocity = jbpAdd(self.velocity, gravity_step)
+    step_velocity = jbpMult(self.velocity, dt)
+    self.desired_position = jbpAdd(self.position, step_velocity)
   end
 
   # Actions
   def idle
     unless idle?
+      puts '>> Idle'
       sprite.stop_all_actions# and animate_idle
       state = :idle
       on_ground = true
@@ -55,12 +57,14 @@ class Player
 
   def fall
     unless falling?
+      @velocity = [@velocity.x, 0].to_point
       state = :falling
     end
   end
 
   def land
     @on_ground = true
+    @velocity = [@velocity.x, 0].to_point
     idle
   end
 

@@ -1,6 +1,6 @@
 class GameWorld
 
-  @gravity = [0, -450]
+  @gravity = [0, -450].to_point
 
   class << self
 
