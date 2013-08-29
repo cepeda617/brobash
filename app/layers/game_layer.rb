@@ -20,7 +20,7 @@ class GameLayer < Joybox::Core::Layer
     level << @player.character
 
     schedule_update do |dt|
-      player.update(dt)
+      GameWorld.apply_gravity @player.character, dt
     end
   end
 

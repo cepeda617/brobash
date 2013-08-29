@@ -16,10 +16,6 @@ class CharacterSprite < Joybox::Core::Sprite
 
   attr_accessor :name, :state, :on_ground, :velocity, :desired_position
 
-  def update( dt )
-    position = GameWorld.apply_gravity self, dt
-  end
-
   def idle
     unless idle?
       stop_all_actions# and animate_idle
