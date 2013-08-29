@@ -22,4 +22,8 @@ class Array
     self.each_with_index.map { |n, i| n + array[i] }
   end
 
+  def add_to!( array )
+    self.replace self.add_to(array)
+  end
+
 end

@@ -1,5 +1,14 @@
 class TileCollisions
 
+  class << self
+
+    def resolve( layer, object )
+      tile_collision = new(layer, object)
+      tile_collision.undo_overlap if tile_collision.hit?
+    end
+
+  end
+
   attr_reader :layer, :object
 
   def initialize( layer, object )
@@ -16,19 +25,28 @@ class TileCollisions
   end
 
   def hit
-    tiles.find { |tile| tile and object.intersects? tile }
+    tiles.find { |tile| tile and object.overlaps? tile }
   end
 
   def hit?
-    hit.present?
+    hit
   end
 
   def hit_index
-    tiles.index(tile_hit)
+    tiles.index(hit)
   end
 
   def overlap
-    object.overlap_with hit
+    size = object.overlap_with(hit).size
+    [size.width, size.height]
+  end
+
+  def horizontal_overlap
+    overlap[0]
+  end
+
+  def vertical_overlap
+    overlap[1]
   end
 
   def bottom?
@@ -55,6 +73,10 @@ class TileCollisions
     hit_index == 4 || hit_index == 6
   end
 
+  def undo_overlap
+    object.destination.add_to! overlap_adjustment
+  end
+
   private
 
   def tiles_around
@@ -66,6 +88,21 @@ class TileCollisions
       coordinates = object_coordinates.to_a.add_to [(columns - 1), (rows - 1)]
       position = layer.point_for_coordinate(coordinates)
       layer.sprite_at position
+    end
+  end
+
+  def overlap_adjustment
+    case hit_index
+    when 0 then [0, horizontal_overlap]
+    when 1 then [0, -horizontal_overlap]
+    when 2 then [vertical_overlap, 0]
+    when 3 then [-vertical_overlap, 0]
+    else
+      if horizontal_overlap > vertical_overlap
+        [0, vertical_overlap * (bottom_corners ? 1 : -1)]
+      else
+        [horizontal_overlap * (left_corners ? 1 : -1), 0]
+      end
     end
   end
 

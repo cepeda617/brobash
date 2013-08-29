@@ -21,7 +21,7 @@ class GameLayer < Joybox::Core::Layer
 
     schedule_update do |dt|
       GameWorld.apply_gravity @player.character, dt
-      TileCollisions.new map_layer.ground, @player.character
+      TileCollisions.resolve map_layer.ground, @player.character
       @player.character.move_to_destination
     end
   end
