@@ -19,7 +19,7 @@ class AppDelegate
 
     @director.view.setMultipleTouchEnabled(true)
 
-    @director << GameScene.new
+    @director << GameLayer.scene
 
     true
   end

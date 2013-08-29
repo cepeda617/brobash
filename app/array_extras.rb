@@ -14,4 +14,12 @@ class Array
     self
   end
 
+  def multiply_by( value )
+    self.map { |n| n.to_i * value }
+  end
+
+  def add_to( array )
+    self.each_with_index.map { |n, i| n + array[i] }
+  end
+
 end
