@@ -10,7 +10,7 @@ class GameWorld
       gravity_step = gravity.multiply_by dt
       object.velocity = object.velocity.add_to gravity_step
       velocity_step = object.velocity.multiply_by dt
-      object.position = object.position.to_a.add_to velocity_step
+      object.destination = object.position.to_a.add_to velocity_step
     end
 
   end

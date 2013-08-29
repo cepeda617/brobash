@@ -2,15 +2,20 @@ class MapLayer < Joybox::Core::Layer
 
   include Joybox::TMX
 
-  attr_reader :ground
+  attr_reader :map, :ground
 
 	def on_enter
     @map = TileMap.new file_name: 'world1-level1.tmx'
     self << @map
 
     @ground = @map.tile_layers[:ground]
-    # center_at [Screen.width/2, Screen.height/2].to_point
   end
+
+
+
+
+
+
 
   def surrounding_tiles( sprite, layer )
     sprite_coordinates = layer.coordinate_for_point(sprite.position)

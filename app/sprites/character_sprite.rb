@@ -14,7 +14,11 @@ class CharacterSprite < Joybox::Core::Sprite
 
   end
 
-  attr_accessor :name, :state, :on_ground, :velocity, :desired_position
+  attr_accessor :name, :state, :on_ground, :velocity, :destination
+
+  def move_to_destination
+    self.position = destination
+  end
 
   def idle
     unless idle?

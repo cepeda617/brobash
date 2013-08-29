@@ -13,14 +13,16 @@ class GameLayer < Joybox::Core::Layer
     background = LayerColor.new color: "92d6dd".to_color
     self << background
 
-    level = MapLayer.new
-    self << level
+    map_layer = MapLayer.new
+    self << map_layer
 
     @player = Player.new character: 'pete', position: [Screen.width * 0.5, Screen.height * 0.8]
-    level << @player.character
+    map_layer << @player.character
 
     schedule_update do |dt|
       GameWorld.apply_gravity @player.character, dt
+      TileCollisions.new map_layer.ground, @player.character
+      @player.character.move_to_destination
     end
   end
 

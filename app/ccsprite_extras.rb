@@ -1,10 +1,10 @@
 class CCSprite
 
-  def intersects?( sprite )
+  def overlaps?( sprite )
     CGRectIntersectsRect(sprite.boundingBox, self.boundingBox)
   end
 
-  def intersection_with( sprite )
+  def overlap_with( sprite )
     CGRectIntersection(sprite.boundingBox, self.boundingBox)
   end
 
