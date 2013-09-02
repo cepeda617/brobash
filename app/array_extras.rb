@@ -26,4 +26,12 @@ class Array
     self.replace self.add_to(array)
   end
 
+  def clamp( min, max )
+    self.each_with_index.map do |value, i|
+      value = value > max[i] ? max[i] : value
+      value = value < min[i] ? min[i] : value
+      value
+    end
+  end
+
 end

@@ -28,16 +28,6 @@ class CharacterSprite < Joybox::Core::Sprite
     end
   end
 
-  def walk_with_direction( direction )
-    if idle?
-      stop_all_actions# and animate_walk
-      self.state = :walking
-    end
-
-    if walking?
-    end
-  end
-
   def jump
     if grounded?
       puts 'JUMP!'
@@ -58,6 +48,20 @@ class CharacterSprite < Joybox::Core::Sprite
     puts 'LANDED!'
     self.on_ground = true
     idle
+  end
+
+  def left
+    walk_with_direction :left
+  end
+
+  def walk_with_direction( direction )
+    if idle?
+      stop_all_actions# and animate_walk
+      self.state = :walking
+    end
+
+    if walking?
+    end
   end
 
   STATES.each do |state_name|

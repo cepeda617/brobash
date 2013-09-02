@@ -15,6 +15,7 @@ class CharacterController
   def interpret
     character.jump if jump?
     character.fall if fall?
+    character.left if left?
   end
 
   def begin( touches )
@@ -45,10 +46,18 @@ class CharacterController
     ended.any? { |touch| jump_range? touch }
   end
 
+  def left?
+    (began & moved).any? { |touch| left_range? touch }
+  end
+
   private
 
   def jump_range?( touch )
     (Screen.width - TOUCH_WIDTH * 2) < touch.location.x && touch.location.x < (Screen.width - TOUCH_WIDTH)
+  end
+
+  def left_range?( touch )
+    0 < touch.location.x && touch.location.x < TOUCH_WIDTH
   end
 
 end
