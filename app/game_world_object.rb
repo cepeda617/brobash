@@ -30,7 +30,7 @@ module GameWorldObject
   end
 
   def clamp_movement
-    self.velocity = self.velocity.clamp [0, -400], [120, 250]
+    self.velocity = self.velocity.clamp [-120, -400], [120, 250]
   end
 
 end

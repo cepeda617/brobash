@@ -1,7 +1,11 @@
 class CharacterSprite < Joybox::Core::Sprite
 
   STATES = %w( idle walking jumping falling )
-  JUMP_FORCE = [0, 300]
+  DEFAULT_STATS =
+  {
+    jump: [0, 300],
+    speed: [800, 0]
+  }
 
   include GameWorldObject
 
@@ -14,12 +18,13 @@ class CharacterSprite < Joybox::Core::Sprite
       character.velocity = [0, 0]
       character.destination = character.position
       character.fall
+      character.stats = DEFAULT_STATS
       character
     end
 
   end
 
-  attr_accessor :name, :state, :on_ground, :velocity, :destination
+  attr_accessor :name, :state, :on_ground, :velocity, :destination, :stats
 
   def idle
     unless idle?
@@ -30,11 +35,10 @@ class CharacterSprite < Joybox::Core::Sprite
 
   def jump
     if grounded?
-      puts 'JUMP!'
       stop_all_actions
       self.on_ground = false
       self.state = :jumping
-      apply_force JUMP_FORCE
+      apply_force stats[:jump]
     end
   end
 
@@ -44,23 +48,25 @@ class CharacterSprite < Joybox::Core::Sprite
     end
   end
 
-  def land
-    puts 'LANDED!'
-    self.on_ground = true
-    idle
+  def left( dt )
+    move -1, dt
   end
 
-  def left
-    walk_with_direction :left
+  def right( dt )
+    move 1, dt
   end
 
-  def walk_with_direction( direction )
+  def move( direction, dt )
     if idle?
-      stop_all_actions# and animate_walk
+      stop_all_actions #and animate walk
       self.state = :walking
     end
 
-    if walking?
+    if walking? || jumping? || falling?
+      self.flip x: (direction < 0)
+      move_step = stats[:speed].multiply_by(direction * dt)
+      puts move_step
+      apply_force move_step
     end
   end
 

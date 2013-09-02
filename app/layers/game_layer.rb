@@ -23,13 +23,15 @@ class GameLayer < Joybox::Core::Layer
     map_layer << @player.character
     world << @player.character
 
+    puts @player.character.methods
+
     # Handle touch events
     touch_input
 
     # Game ticker
     schedule_update do |dt|
       world.update(dt)
-      @player.controller.interpret
+      @player.controller.interpret dt
     end
   end
 
