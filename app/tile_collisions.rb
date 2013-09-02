@@ -18,9 +18,9 @@ class TileCollisions
     "\nObject: #{ object.position.to_a } with bounding: #{ object.boundingBox.to_a }\nHit: #{ hit.position.to_a } with overlap: #{ overlap_adjustment }\n\n"
   end
 
-  def tiles
-    %w( 1 7 3 5 6 8 0 2 ).map { |index| tiles_around[index.to_i] }
-  end
+  # def tiles
+  #   %w( 1 7 3 5 6 8 0 2 ).map { |index| tiles_around[index.to_i] }
+  # end
 
   def hit
     tiles.find { |tile| tile and object.overlaps? tile }
@@ -48,19 +48,19 @@ class TileCollisions
   end
 
   def bottom?
-    hit? && hit_index == 0
-  end
-
-  def top?
     hit? && hit_index == 1
   end
 
+  def top?
+    hit? && hit_index == 7
+  end
+
   def left?
-    hit? && hit_index == 2
+    hit? && hit_index == 3
   end
 
   def right?
-    hit? && hit_index == 3
+    hit? && hit_index == 5
   end
 
   def top_corners?
@@ -68,11 +68,11 @@ class TileCollisions
   end
 
   def bottom_corners?
-    hit? && hit_index > 5
+    hit? && (hit_index == 6 || hit_index == 8)
   end
 
   def left_corners?
-    hit? && (hit_index == 4 || hit_index == 6)
+    hit? && (hit_index == 0 || hit_index == 6)
   end
 
   def undo_overlap
@@ -89,7 +89,8 @@ class TileCollisions
 
   private
 
-  def tiles_around
+  # def tiles_around
+  def tiles
     object_coordinates = layer.coordinate_for_point object.position
     # puts "\nObject: #{ object_coordinates.to_a }\n"
 
@@ -104,17 +105,24 @@ class TileCollisions
   end
 
   def overlap_adjustment
-    case hit_index
-    when 0 then [0, vertical_overlap]
-    when 1 then [0, -vertical_overlap]
-    when 2 then [horizontal_overlap, 0]
-    when 3 then [-horizontal_overlap, 0]
+    # case hit_index
+    # when 0 then [0, vertical_overlap]
+    # when 1 then [0, -vertical_overlap]
+    # when 2 then [horizontal_overlap, 0]
+    # when 3 then [-horizontal_overlap, 0]
+    if bottom?
+      [0, vertical_overlap]
+    elsif top?
+      [0, -vertical_overlap]
+    elsif left?
+      [horizontal_overlap, 0]
+    elsif right?
+      [-horizontal_overlap, 0]
     else
       if horizontal_overlap > vertical_overlap
-        object.velocity = [object.velocity.first, 0]
-        [0, vertical_overlap * (bottom_corners ? 1 : -1)]
+        [0, vertical_overlap * (bottom_corners? ? 1 : -1)]
       else
-        [horizontal_overlap * (left_corners ? 1 : -1), 0]
+        [horizontal_overlap * (left_corners? ? 1 : -1), 0]
       end
     end
   end
