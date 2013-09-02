@@ -8,7 +8,9 @@ class CharacterSprite < Joybox::Core::Sprite
       name = name.to_s.downcase
       character = new options.merge frame_name: "#{ name }-character-idle0.png"
       character.name = name
+      character.destination = character.position
       character.velocity = [0, 0]
+      character.fall
       character
     end
 
@@ -16,15 +18,10 @@ class CharacterSprite < Joybox::Core::Sprite
 
   attr_accessor :name, :state, :on_ground, :velocity, :destination
 
-  def move_to_destination
-    self.position = destination
-  end
-
   def idle
     unless idle?
       stop_all_actions# and animate_idle
       state = :idle
-      on_ground = true
     end
   end
 
@@ -40,19 +37,13 @@ class CharacterSprite < Joybox::Core::Sprite
 
   def fall
     unless falling?
-      @velocity = [@velocity.x, 0].to_point
-      state = :falling
+      self.state = :falling
     end
   end
 
   def land
-    @on_ground = true
-    @velocity = [@velocity.x, 0].to_point
+    self.velocity = [self.velocity.first, 0]
     idle
-  end
-
-  def grounded?
-    @on_ground
   end
 
   STATES.each do |state_name|

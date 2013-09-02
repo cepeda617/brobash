@@ -1,18 +1,28 @@
 class GameWorld
 
-  @gravity = [0, -450]
+  attr_accessor :gravity, :objects, :ground
 
-  class << self
+  def initialize
+    @gravity = default_gravity
+    @objects = []
+    @ground = nil
+  end
 
-    attr_accessor :gravity
+  def <<( object )
+    objects << GameWorldObject.new(object) if object
+  end
 
-    def apply_gravity( object, dt )
-      gravity_step = gravity.multiply_by dt
-      object.velocity = object.velocity.add_to gravity_step
-      velocity_step = object.velocity.multiply_by dt
-      object.destination = object.position.to_a.add_to velocity_step
+  def update( dt )
+    objects.each do |object|
+      object.apply_gravity gravity, dt
+      object.collisions_with(ground).resolve
     end
+  end
 
+  private
+
+  def default_gravity
+    [0, -400]
   end
 
 end

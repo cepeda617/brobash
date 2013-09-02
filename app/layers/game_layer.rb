@@ -16,13 +16,15 @@ class GameLayer < Joybox::Core::Layer
     map_layer = MapLayer.new
     self << map_layer
 
-    @player = Player.new character: 'pete', position: [Screen.width * 0.5, Screen.height * 0.8]
+    world = GameWorld.new
+    world.ground = map_layer.ground
+
+    @player = Player.new character: 'pete', position: [Screen.half_width, Screen.height * 0.8]
     map_layer << @player.character
+    world << @player.character
 
     schedule_update do |dt|
-      GameWorld.apply_gravity @player.character, dt
-      TileCollisions.resolve map_layer.ground, @player.character
-      @player.character.move_to_destination
+      world.update(dt)
     end
   end
 
