@@ -11,16 +11,16 @@ class TileCollisions
     object.on_ground = true if landing?
     object.velocity = [object.velocity.first, 0] if stop_velocity?
     undo_overlap if hit?
+    object.update_position
+  end
+
+  def undo_overlap
+    object.destination.add_to! overlap_adjustment
   end
 
   def to_s
-    # "\nObject: #{ object.position.to_a } with bounding: #{ object.boundingBox.to_a }\nTiles: #{ tile_positions }\nTile: #{ hit.position.to_a } at index: #{ hit_index } and\noverlap: [#{ horizontal_overlap }, #{ vertical_overlap }]\n\n"
     "\nObject: #{ object.position.to_a } with bounding: #{ object.boundingBox.to_a }\nHit: #{ hit.position.to_a } with overlap: #{ overlap_adjustment }\n\n"
   end
-
-  # def tiles
-  #   %w( 1 7 3 5 6 8 0 2 ).map { |index| tiles_around[index.to_i] }
-  # end
 
   def hit
     tiles.find { |tile| tile and object.overlaps? tile }
@@ -48,11 +48,11 @@ class TileCollisions
   end
 
   def bottom?
-    hit? && hit_index == 1
+    hit? && hit_index == 7
   end
 
   def top?
-    hit? && hit_index == 7
+    hit? && hit_index == 1
   end
 
   def left?
@@ -75,10 +75,6 @@ class TileCollisions
     hit? && (hit_index == 0 || hit_index == 6)
   end
 
-  def undo_overlap
-    object.destination.add_to! overlap_adjustment
-  end
-
   def stop_velocity?
     bottom? || bottom_corners? || top? || top_corners?
   end
@@ -89,27 +85,16 @@ class TileCollisions
 
   private
 
-  # def tiles_around
   def tiles
-    object_coordinates = layer.coordinate_for_point object.position
-    # puts "\nObject: #{ object_coordinates.to_a }\n"
-
     tiles = (0..8).to_a.map do |i|
       columns = i % 3
       rows = (i / 3).to_i
-      coordinates = object_coordinates.to_a.add_to [(columns - 1), (rows - 1)]
-      position = layer.point_for_coordinate(coordinates)
-      # puts "Tile coordinates: #{ coordinates }\n\n"
-      layer.sprite_at position
+      column_row_matrix = [(columns - 1) * -32, (rows -1) * -32]
+      layer.sprite_at object.position.to_a.add_to column_row_matrix
     end
   end
 
   def overlap_adjustment
-    # case hit_index
-    # when 0 then [0, vertical_overlap]
-    # when 1 then [0, -vertical_overlap]
-    # when 2 then [horizontal_overlap, 0]
-    # when 3 then [-horizontal_overlap, 0]
     if bottom?
       [0, vertical_overlap]
     elsif top?

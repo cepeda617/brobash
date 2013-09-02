@@ -17,7 +17,6 @@ class GameWorld
     objects.each do |object|
       object.apply_gravity gravity, dt
       object.collisions_with(ground).resolve
-      object.update_position
     end
   end
 
