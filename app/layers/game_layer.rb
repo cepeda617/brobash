@@ -23,13 +23,32 @@ class GameLayer < Joybox::Core::Layer
     map_layer << @player.character
     world << @player.character
 
+    # Handle touch events
+    touch_input
+
+    # Game ticker
     schedule_update do |dt|
       world.update(dt)
+      @player.controller.interpret
     end
   end
 
   def on_exit
     # Tear down
+  end
+
+  def touch_input
+    on_touches_began do |touches, event|
+      @player.controller.begin touches
+    end
+
+    on_touches_ended do |touches, event|
+      @player.controller.end touches
+    end
+
+    on_touches_moved do |touches, event|
+      @player.controller.move touches
+    end
   end
 
 end

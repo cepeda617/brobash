@@ -1,6 +1,7 @@
 class CharacterSprite < Joybox::Core::Sprite
 
-  STATES = %w( idle walking falling )
+  STATES = %w( idle walking jumping falling )
+  JUMP_FORCE = [0, 300]
 
   include GameWorldObject
 
@@ -23,35 +24,45 @@ class CharacterSprite < Joybox::Core::Sprite
   def idle
     unless idle?
       stop_all_actions# and animate_idle
-      state = :idle
+      self.state = :idle
     end
   end
 
   def walk_with_direction( direction )
     if idle?
       stop_all_actions# and animate_walk
-      state = :walking
+      self.state = :walking
     end
 
     if walking?
     end
   end
 
+  def jump
+    if grounded?
+      puts 'JUMP!'
+      stop_all_actions
+      self.on_ground = false
+      self.state = :jumping
+      apply_force JUMP_FORCE
+    end
+  end
+
   def fall
     unless falling?
-      self.on_ground = false
       self.state = :falling
     end
   end
 
   def land
+    puts 'LANDED!'
     self.on_ground = true
     idle
   end
 
   STATES.each do |state_name|
     define_method "#{ state_name }?" do
-      self.state == state_name
+      self.state == state_name.to_sym
     end
   end
 
