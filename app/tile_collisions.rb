@@ -8,12 +8,9 @@ class TileCollisions
   end
 
   def resolve
-    # puts self if bottom? || bottom_corners?
-    if bottom? || bottom_corners?
-      object.on_ground = true
-    end
+    object.on_ground = true if landing?
+    object.velocity = [object.velocity.first, 0] if stop_velocity?
     undo_overlap if hit?
-    object.position = object.destination
   end
 
   def to_s
@@ -66,6 +63,10 @@ class TileCollisions
     hit? && hit_index == 3
   end
 
+  def top_corners?
+    hit? && (hit_index == 0 || hit_index == 2)
+  end
+
   def bottom_corners?
     hit? && hit_index > 5
   end
@@ -76,6 +77,14 @@ class TileCollisions
 
   def undo_overlap
     object.destination.add_to! overlap_adjustment
+  end
+
+  def stop_velocity?
+    bottom? || bottom_corners? || top? || top_corners?
+  end
+
+  def landing?
+    bottom? || bottom_corners?
   end
 
   private
@@ -102,6 +111,7 @@ class TileCollisions
     when 3 then [-horizontal_overlap, 0]
     else
       if horizontal_overlap > vertical_overlap
+        object.velocity = [object.velocity.first, 0]
         [0, vertical_overlap * (bottom_corners ? 1 : -1)]
       else
         [horizontal_overlap * (left_corners ? 1 : -1), 0]

@@ -9,13 +9,15 @@ class GameWorld
   end
 
   def <<( object )
-    objects << GameWorldObject.new(object) if object
+    objects << object
+    objects.compact
   end
 
   def update( dt )
     objects.each do |object|
       object.apply_gravity gravity, dt
       object.collisions_with(ground).resolve
+      object.update_position
     end
   end
 

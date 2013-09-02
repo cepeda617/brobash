@@ -2,14 +2,16 @@ class CharacterSprite < Joybox::Core::Sprite
 
   STATES = %w( idle walking falling )
 
+  include GameWorldObject
+
   class << self
 
     def with_name( name, options = {} )
       name = name.to_s.downcase
       character = new options.merge frame_name: "#{ name }-character-idle0.png"
       character.name = name
-      character.destination = character.position
       character.velocity = [0, 0]
+      character.destination = character.position
       character.fall
       character
     end
@@ -37,12 +39,13 @@ class CharacterSprite < Joybox::Core::Sprite
 
   def fall
     unless falling?
+      self.on_ground = false
       self.state = :falling
     end
   end
 
   def land
-    self.velocity = [self.velocity.first, 0]
+    self.on_ground = true
     idle
   end
 
