@@ -23,8 +23,6 @@ class GameLayer < Joybox::Core::Layer
     map_layer << @player.character
     world << @player.character
 
-    puts @player.character.methods
-
     # Handle touch events
     touch_input
 

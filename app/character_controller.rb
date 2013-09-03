@@ -3,56 +3,50 @@ class CharacterController
   TOUCH_WIDTH = 80
 
   attr_reader :character
-  attr_accessor :began, :ended, :moved
+  attr_accessor :current_touches
 
   def initialize( character )
     @character = character
-    @began = []
-    @ended = []
-    @moved = []
+    @current_touches = []
   end
 
   def interpret( dt )
     character.jump if jump?
-    character.fall if fall?
     character.left(dt) if left?
     character.right(dt) if right?
+    character.idle if no_input?
   end
 
   def begin( touches )
-    self.began = touches.allObjects
+    self.current_touches = touches.allObjects
   end
 
   def end( touches )
-    self.ended = touches.allObjects
+    self.current_touches -= touches.allObjects
   end
 
   def move( touches )
-    self.moved = touches.allObjects
+    self.current_touches = touches.allObjects
   end
 
-  def all
-    began & ended & moved
+  def no_input?
+    current_touches.empty? || not_recognized?
   end
 
-  def input?
-    !all.empty?
+  def not_recognized?
+    !(jump? || left? || right?)
   end
 
   def jump?
-    began.any? { |touch| jump_range? touch  }
-  end
-
-  def fall?
-    ended.any? { |touch| jump_range? touch }
+    current_touches.any? { |touch| jump_range? touch  }
   end
 
   def left?
-    began.any? { |touch| left_range? touch }
+    current_touches.any? { |touch| left_range? touch }
   end
 
   def right?
-    began.any? { |touch| right_range? touch }
+    current_touches.any? { |touch| right_range? touch }
   end
 
   private

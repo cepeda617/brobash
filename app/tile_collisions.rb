@@ -23,7 +23,7 @@ class TileCollisions
   end
 
   def hit
-    tiles.find { |tile| tile and object.overlaps? tile }
+    tiles.find { |tile| tile and object.overlaps? tile } if tiles
   end
 
   def hit?

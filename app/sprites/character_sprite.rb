@@ -28,7 +28,7 @@ class CharacterSprite < Joybox::Core::Sprite
 
   def idle
     unless idle?
-      stop_all_actions# and animate_idle
+      animate :idle
       self.state = :idle
     end
   end
@@ -58,14 +58,13 @@ class CharacterSprite < Joybox::Core::Sprite
 
   def move( direction, dt )
     if idle?
-      stop_all_actions #and animate walk
+      animate :walk
       self.state = :walking
     end
 
     if walking? || jumping? || falling?
       self.flip x: (direction < 0)
       move_step = stats[:speed].multiply_by(direction * dt)
-      puts move_step
       apply_force move_step
     end
   end
@@ -74,6 +73,30 @@ class CharacterSprite < Joybox::Core::Sprite
     define_method "#{ state_name }?" do
       self.state == state_name.to_sym
     end
+  end
+
+  private
+
+  def animate( action )
+    stop_all_actions and self.run_action animations[action]
+  end
+
+  def animations
+    {
+      idle: animation_for(:idle),
+      walk: animation_for(:walk),
+      attack: animation_for(:attack, repeat: false, speed: 18)
+    }
+  end
+
+  def animation_for( action, options = {} )
+    delay = 1.0 / (options[:speed] || 12)
+    repeat = options[:repeat] || true
+    prefix = '%s-character-%s' % [name, action]
+
+    action_frames = SpriteFrameCache.frames.where prefix: prefix, suffix: '.png', from: 0
+    animation = Animation.new frames: action_frames, delay: delay
+    repeat ? Repeat.forever(action: animation.action) : Animate.with(action: animation.action)
   end
 
 end
