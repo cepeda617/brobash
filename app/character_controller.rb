@@ -14,6 +14,7 @@ class CharacterController
     character.jump if jump?
     character.left(dt) if left?
     character.right(dt) if right?
+    character.attack if attack?
     character.idle if no_input?
   end
 
@@ -49,6 +50,10 @@ class CharacterController
     current_touches.any? { |touch| right_range? touch }
   end
 
+  def attack?
+    current_touches.any? { |touch| attack_range? touch }
+  end
+
   private
 
   def jump_range?( touch )
@@ -61,6 +66,10 @@ class CharacterController
 
   def right_range?( touch )
     TOUCH_WIDTH < touch.location.x && touch.location.x <= (TOUCH_WIDTH * 2)
+  end
+
+  def attack_range?( touch )
+    (Screen.width - TOUCH_WIDTH) < touch.location.x && touch.location.x < Screen.width
   end
 
 end

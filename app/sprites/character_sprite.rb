@@ -1,6 +1,6 @@
 class CharacterSprite < Joybox::Core::Sprite
 
-  STATES = %w( idle walking jumping falling )
+  STATES = %w( idle walking jumping attacking falling )
   DEFAULT_STATS =
   {
     jump: [0, 300],
@@ -69,6 +69,13 @@ class CharacterSprite < Joybox::Core::Sprite
     end
   end
 
+  def attack
+    unless attacking?
+      animate :attack
+      self.state = :attacking
+    end
+  end
+
   STATES.each do |state_name|
     define_method "#{ state_name }?" do
       self.state == state_name.to_sym
@@ -91,7 +98,7 @@ class CharacterSprite < Joybox::Core::Sprite
 
   def animation_for( action, options = {} )
     delay = 1.0 / (options[:speed] || 12)
-    repeat = options[:repeat] || true
+    repeat = options.key?(:repeat) ? options[:repeat] : true
     prefix = '%s-character-%s' % [name, action]
 
     action_frames = SpriteFrameCache.frames.where prefix: prefix, suffix: '.png', from: 0
