@@ -2,7 +2,9 @@ class GameLayer < Joybox::Core::Layer
 
   scene
 
-  attr_accessor :player, :controller
+  include Joybox::TMX
+
+  attr_accessor :player, :controller, :world
 
   def on_enter
     SpriteFrameCache.frames.add file_name: 'sprites/characters.plist'
@@ -10,26 +12,29 @@ class GameLayer < Joybox::Core::Layer
     sprite_batch.texture.setAliasTexParameters
     self << sprite_batch
 
+    @world = World.new gravity: [0, -25]
+
     background = LayerColor.new color: "92d6dd".to_color
     self << background
 
-    map_layer = MapLayer.new
-    self << map_layer
+    self << level
+    add_ground
 
-    world = GameWorld.new
-    world.ground = map_layer.ground
+    character_body = @world.new_body position: [Screen.half_width, Screen.height * 0.8], type: Body::Dynamic do
+      polygon_fixture box: [32, 32]
+    end
 
-    @player = Player.new character: 'pete', position: [Screen.half_width, Screen.height * 0.8]
-    map_layer << @player.character
-    world << @player.character
+    @player = Player.new character: 'pete', body: character_body
+    level << @player.character
 
     # Handle touch events
     touch_input
 
     # Game ticker
     schedule_update do |dt|
-      world.update(dt)
+      @world.step delta: dt
       @player.controller.interpret dt
+      @player.character.update
     end
   end
 
@@ -48,6 +53,22 @@ class GameLayer < Joybox::Core::Layer
 
     on_touches_moved do |touches, event|
       @player.controller.move touches
+    end
+  end
+
+  def level
+    @level ||= TileMap.new file_name: 'world1-level1.tmx'
+  end
+
+  def ground
+    @ground ||= level.object_layers[:collision]
+  end
+
+  def add_ground
+    ground.objects.each do |object|
+      world.new_body position: [object[:x].to_i, object[:y].to_i], type: Body::Static do
+        polygon_fixture box: [object[:width].to_i, object[:height].to_i]
+      end
     end
   end
 
