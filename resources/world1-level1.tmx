@@ -13,29 +13,6 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="50" name="meta-tiles" tilewidth="32" tileheight="32">
-  <image source="meta-tiles.png" width="128" height="32"/>
-  <tile id="0">
-   <properties>
-    <property name="Harmful" value="True"/>
-   </properties>
-  </tile>
-  <tile id="1">
-   <properties>
-    <property name="Destructible" value="True"/>
-   </properties>
-  </tile>
-  <tile id="2">
-   <properties>
-    <property name="Collidable" value="True"/>
-   </properties>
-  </tile>
-  <tile id="3">
-   <properties>
-    <property name="Spirit" value="True"/>
-   </properties>
-  </tile>
- </tileset>
  <layer name="ground" width="15" height="10">
   <data encoding="base64" compression="zlib">
    eJxjYBiZgJECdUxIcrgwsjpcgAkLJgUwQ/Uwk6gPWT+tAAAevAAj
@@ -46,9 +23,4 @@
   <object x="384" y="128" width="32" height="64"/>
   <object x="128" y="160" width="224" height="32"/>
  </objectgroup>
- <layer name="meta" width="15" height="10" opacity="0">
-  <data encoding="base64" compression="zlib">
-   eJxjYBiZwAQL3wSHODX1EuOW4QAAkvYCPQ==
-  </data>
- </layer>
 </map>
