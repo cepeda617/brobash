@@ -11,23 +11,14 @@ class GameLayer < Joybox::Core::Layer
 
     @world = World.new gravity: [0, -25]
 
-    # background = LayerColor.new color: "92d6dd".to_color
-    # self << background
+    add_level
 
-    grid = Sprite.new file_name: 'arena.png', position: Screen.center
-    self << grid
-
-    self << level
-    add_ground
-
-    puts "#{ world.bodies.map(&:position).map(&:to_a) }"
-
-    character_body = @world.new_body position: [Screen.half_width, Screen.height * 0.8], type: Body::Dynamic do
-      polygon_fixture box: [32, 32]
+    character_body = @world.new_body position: Screen.center, type: Body::Dynamic do
+      polygon_fixture box: [16, 16]
     end
 
     @player = Player.new character: 'pete', body: character_body
-    level << @player.character
+    self << @player.character
 
     # Handle touch events
     touch_input
@@ -37,6 +28,20 @@ class GameLayer < Joybox::Core::Layer
       @world.step delta: dt
       @player.controller.interpret dt
       @player.character.update
+    end
+  end
+
+  def add_level
+    level_image = Sprite.new file_name: 'arena.png', position: Screen.center
+    level_image.zOrder = -10
+    self << level_image
+
+    world.new_body type: Body::Static do
+      # polygon_fixture vertices: [[64, 95], [416, 95], [434, 87], [46, 87]]
+      edge_fixture start_point: [64, 95], end_point: [416, 95]
+      edge_fixture start_point: [416, 95], end_point: [434, 87]
+      edge_fixture start_point: [434, 87], end_point: [46, 87]
+      edge_fixture start_point: [46, 87], end_point: [64, 95]
     end
   end
 
@@ -63,22 +68,6 @@ class GameLayer < Joybox::Core::Layer
     sprite_batch = SpriteBatch.new file_name: "sprites/#{ file_name }.pvr.ccz"
     sprite_batch.texture.setAliasTexParameters
     self << sprite_batch
-  end
-
-  def level
-    @level ||= TileMap.new file_name: 'world1-level1.tmx'
-  end
-
-  def ground
-    @ground ||= level.object_layers[:collision]
-  end
-
-  def add_ground
-    ground.objects.each do |object|
-      world.new_body position: [object[:x], object[:y]], type: Body::Static do
-        polygon_fixture box: [object[:width].to_i, object[:height].to_i]
-      end
-    end
   end
 
 end

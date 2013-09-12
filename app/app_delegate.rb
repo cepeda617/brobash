@@ -4,7 +4,7 @@ class AppDelegate
 
     @director = Joybox::Configuration.setup do
       director display_stats: true, enable_retina_display: false
-      debug repl:true # interactive console support for joybox (turn off for deployment!)
+      debug repl:true, physics: [:aabb, :shapes] # interactive console support for joybox (turn off for deployment!)
     end
 
     @navigation_controller = UINavigationController.alloc.initWithRootViewController(@director)
