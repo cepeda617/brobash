@@ -1,30 +1,24 @@
 class CharacterSprite < Joybox::Physics::PhysicsSprite
 
   STATES = %w( idle walking jumping attacking falling )
-  DEFAULT_STATS =
-  {
-    jump: [0, 300],
-    speed: [800, 0]
-  }
 
-  # include GameWorldObject
+  attr_accessor :state
 
-  class << self
-
-    def with_name( name, options = {} )
-      name = name.to_s.downcase
-      character = new options.merge frame_name: "#{ name }-character-idle0.png"
-      character.name = name
-      character.velocity = [0, 0]
-      character.destination = character.position
-      character.fall
-      character.stats = DEFAULT_STATS
-      character
-    end
-
+  def self.with_name( name )
+    name = name.to_s.downcase
+    options = {
+      body: Level.new_character_body,
+      frame_name: "#{ name }-character-idle0.png",
+      jump_force: [0, 300],
+      name: name,
+      powerup: nil,
+      speed: [800, 0],
+      state: :idle
+    }
+    character = new options
+    character.fall
+    character
   end
-
-  attr_accessor :name, :state, :velocity, :destination, :stats
 
   def update
     @is_falling = body.linear_velocity.y < 0
@@ -48,7 +42,7 @@ class CharacterSprite < Joybox::Physics::PhysicsSprite
     if grounded?
       stop_all_actions
       self.state = :jumping
-      body.apply_force force: stats[:jump]
+      body.apply_force force: self[:jump_force]
     end
   end
 
@@ -72,7 +66,7 @@ class CharacterSprite < Joybox::Physics::PhysicsSprite
 
     if walking? || jumping? || falling?
       self.flip x: (direction < 0)
-      move_step = stats[:speed].multiply_by(direction * dt)
+      move_step = self[:speed].multiply_by(direction * dt)
       body.apply_force force: move_step
     end
   end
@@ -107,7 +101,7 @@ class CharacterSprite < Joybox::Physics::PhysicsSprite
   def animation_for( action, options = {} )
     delay = 1.0 / (options[:speed] || 12)
     repeat = options.key?(:repeat) ? options[:repeat] : true
-    prefix = '%s-character-%s' % [name, action]
+    prefix = '%s-character-%s' % [self[:name], action]
 
     action_frames = SpriteFrameCache.frames.where prefix: prefix, suffix: '.png', from: 0
     animation = Animation.new frames: action_frames, delay: delay

@@ -5,7 +5,7 @@ class Player
   end
 
   def character
-    @character ||= CharacterSprite.with_name options[:character], body: options[:body]
+    @character ||= CharacterSprite.with_name options[:character]
   end
 
   def controller

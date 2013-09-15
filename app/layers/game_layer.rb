@@ -9,15 +9,9 @@ class GameLayer < Joybox::Core::Layer
   def on_enter
     add_sprite_batch :characters
 
-    @world = World.new gravity: [0, -25]
+    Level.arena self
 
-    add_level
-
-    character_body = @world.new_body position: Screen.center, type: Body::Dynamic do
-      polygon_fixture box: [16, 16]
-    end
-
-    @player = Player.new character: 'pete', body: character_body
+    @player = Player.new character: 'pete'
     self << @player.character
 
     # Handle touch events
@@ -25,23 +19,9 @@ class GameLayer < Joybox::Core::Layer
 
     # Game ticker
     schedule_update do |dt|
-      @world.step delta: dt
+      Level.world.step delta: dt
       @player.controller.interpret dt
       @player.character.update
-    end
-  end
-
-  def add_level
-    level_image = Sprite.new file_name: 'arena.png', position: Screen.center
-    level_image.zOrder = -10
-    self << level_image
-
-    world.new_body type: Body::Static do
-      # polygon_fixture vertices: [[64, 95], [416, 95], [434, 87], [46, 87]]
-      edge_fixture start_point: [64, 95], end_point: [416, 95]
-      edge_fixture start_point: [416, 95], end_point: [434, 87]
-      edge_fixture start_point: [434, 87], end_point: [46, 87]
-      edge_fixture start_point: [46, 87], end_point: [64, 95]
     end
   end
 
